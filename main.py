@@ -8,7 +8,7 @@ import yt_dlp
 from telegram import Update, InputFile
 from telegram.ext import Application, MessageHandler, CommandHandler, ContextTypes, filters
 
-BOT_TOKEN = "8303690654:AAHmEuVyFzyJxpgDZoUOCDaUgfQhoKBkbbo"
+BOT_TOKEN = "git push origin main"
 
 URL_REGEX = re.compile(r"(https?://[^\s]+)", re.IGNORECASE)
 
