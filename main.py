@@ -2,13 +2,14 @@ import re
 import asyncio
 import tempfile
 from pathlib import Path
-from typing import Optional, Dict, Any, Tuple
+from typing import Optional, Dict, Any
 
 import yt_dlp
 from telegram import Update, InputFile
 from telegram.ext import Application, MessageHandler, CommandHandler, ContextTypes, filters
 
-BOT_TOKEN = "git push origin main"
+# Telegram bot tokenini shu yerga yozing
+BOT_TOKEN = "8303690654:AAHmEuVyFzyJxpgDZoUOCDaUgfQhoKBkbbo"
 
 URL_REGEX = re.compile(r"(https?://[^\s]+)", re.IGNORECASE)
 
@@ -43,14 +44,16 @@ def download_video(url: str, tmpdir: Path) -> Path:
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message:
-        await update.message.reply_text("Instagram Tik tok yoki You tube videolaridan link yuboring. Bot faqat videoni jo'natadi 📹")
-
+        await update.message.reply_text(
+            "Instagram, TikTok yoki YouTube videolaridan link yuboring. Bot faqat videoni jo'natadi 📹"
+        )
 
 async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message:
         return
     url = extract_first_url(update.message.text or "")
     if not url:
+        await update.message.reply_text("Iltimos, haqiqiy URL yuboring.")
         return 
 
     try:
@@ -59,16 +62,16 @@ async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
             loop = asyncio.get_running_loop()
             video_path = await loop.run_in_executor(None, download_video, url, tdir)
 
-        
             with open(video_path, "rb") as vf:
                 await update.message.reply_video(video=InputFile(vf, filename=video_path.name))
     except Exception as e:
         print("Download/send error:", e)
+        await update.message.reply_text("Videoni yuklab bo‘lmadi ❌")
 
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & (filters.Entity("url") | filters.Entity("text_link")), handle_url))
+    app.add_handler(MessageHandler(filters.TEXT, handle_url))
     app.run_polling()
 
 if __name__ == "__main__":
